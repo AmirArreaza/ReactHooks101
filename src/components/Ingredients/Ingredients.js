@@ -36,9 +36,16 @@ const Ingredients = () => {
   };
 
   const removeIngredientHandler = (ingredientId) => {
-    setUserIngridients((prevIngredients) =>
-      prevIngredients.filter((ing) => ing.id !== ingredientId)
-    );
+    fetch(
+      `https://react-hooks-update-66a24.firebaseio.com/ingredients/${ingredientId}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((response) => {
+      setUserIngridients((prevIngredients) =>
+        prevIngredients.filter((ing) => ing.id !== ingredientId)
+      );
+    });
   };
 
   const filteredIngredientsHanlder = useCallback((filteredIngridients) => {
