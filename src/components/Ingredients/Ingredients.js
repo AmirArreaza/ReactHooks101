@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -25,7 +25,7 @@ const Ingredients = () => {
       });
   }, []);
 
-  //without [] acts like ComponentDidUpdate (every render) runs 
+  //without [] acts like ComponentDidUpdate (every render) runs
   //after evetry component update re-render
   useEffect(() => {
     console.log("Rendering ingredients", userIngredients);
@@ -56,11 +56,15 @@ const Ingredients = () => {
     );
   };
 
+  const filteredIngredientsHanlder = useCallback((filteredIngridients) => {
+    setUserIngridients(filteredIngridients);
+  }, []);
+
   return (
     <div className="App">
       <IngredientForm onAddIngredient={addIngridientHandler} />
       <section>
-        <Search />
+        <Search onLoadIngredients={filteredIngredientsHanlder} />
         <IngredientList
           ingredients={userIngredients}
           onRemoveItem={removeIngredientHandler}
