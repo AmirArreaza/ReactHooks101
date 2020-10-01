@@ -9,7 +9,7 @@ const Search = React.memo((props) => {
   const inputRef = useRef();
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (enteredFilter === inputRef.current.value) {
         console.log("Filtro ", enteredFilter);
         const query =
@@ -34,6 +34,12 @@ const Search = React.memo((props) => {
           });
       }
     }, 500);
+
+    //Clean up function, run before the next action start.
+    //if you have [] dependencies the cleanup runs when component gets unmount
+    return () => {
+      clearTimeout(timer);
+    };
   }, [enteredFilter, onLoadIngredients, inputRef]);
 
   return (
