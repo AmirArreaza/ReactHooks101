@@ -9,21 +9,6 @@ const Ingredients = () => {
 
   //Used to manage side effects
   //with [] useEffect acts like ComponentDidMount (it only run once)
-  useEffect(() => {
-    fetch("https://react-hooks-update-66a24.firebaseio.com/ingredients.json")
-      .then((response) => response.json())
-      .then((body) => {
-        const loadedIngredients = [];
-        for (const key in body) {
-          loadedIngredients.push({
-            id: key,
-            title: body[key].ingredient.title,
-            amount: body[key].ingredient.amount,
-          });
-        }
-        setUserIngridients(loadedIngredients);
-      });
-  }, []);
 
   //without [] acts like ComponentDidUpdate (every render) runs
   //after evetry component update re-render
