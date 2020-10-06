@@ -21,7 +21,15 @@ const ingredientReducer = (currentIngredients, action) => {
 
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
-  const { isLoading, error, data, sendRequest, reqExtra, reqIdentifier } = useHttp();
+  const {
+    isLoading,
+    error,
+    data,
+    sendRequest,
+    reqExtra,
+    reqIdentifier,
+    clear,
+  } = useHttp();
 
   //Used to manage side effects
   //with [] useEffect acts like ComponentDidMount (it only run once)
@@ -29,23 +37,26 @@ const Ingredients = () => {
   //without [] acts like ComponentDidUpdate (every render) runs
   //after evetry component update re-render
   useEffect(() => {
-    if (!isLoading && !error && reqIdentifier === 'REMOVE_ING') {
+    if (!isLoading && !error && reqIdentifier === "REMOVE_ING") {
       dispatch({ type: "DELETE", id: reqExtra });
-    } else if(!isLoading && !error && reqIdentifier === 'ADD_ING') {
+    } else if (!isLoading && !error && reqIdentifier === "ADD_ING") {
       dispatch({ type: "ADD", ingredient: { id: data.name, ...reqExtra } });
     }
-  }, [data, reqExtra, reqIdentifier, isLoading]);
+  }, [data, reqExtra, reqIdentifier, isLoading, error]);
 
-  const addIngridientHandler = useCallback((ingredient) => {
-    //dispatchHttp({ type: "SEND" });
-    sendRequest(
-      "https://react-hooks-update-66a24.firebaseio.com/ingredients.json",
-      "POST",
-      JSON.stringify({ ingredient }),
-      ingredient,
-      'ADD_ING'
-    );
-  }, [sendRequest]);
+  const addIngridientHandler = useCallback(
+    (ingredient) => {
+      //dispatchHttp({ type: "SEND" });
+      sendRequest(
+        "https://react-hooks-update-66a24.firebaseio.com/ingredients.json",
+        "POST",
+        JSON.stringify({ ingredient }),
+        ingredient,
+        "ADD_ING"
+      );
+    },
+    [sendRequest]
+  );
 
   const removeIngredientHandler = useCallback(
     (ingredientId) => {
@@ -54,7 +65,7 @@ const Ingredients = () => {
         "DELETE",
         null,
         ingredientId,
-        'REMOVE_ING'
+        "REMOVE_ING"
       );
     },
     [sendRequest]
@@ -63,10 +74,6 @@ const Ingredients = () => {
   const filteredIngredientsHanlder = useCallback((filteredIngridients) => {
     //setUserIngridients(filteredIngridients);
     dispatch({ type: "SET", ingredients: filteredIngridients });
-  }, []);
-
-  const clearError = useCallback(() => {
-    //dispatchHttp({ type: "CLEAR" });
   }, []);
 
   const ingredientList = useMemo(() => {
@@ -80,7 +87,7 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      {error ? <ErrorModal onClose={clearError}>{error}</ErrorModal> : null}
+      {error ? <ErrorModal onClose={clear}>{error}</ErrorModal> : null}
       <IngredientForm
         onAddIngredient={addIngridientHandler}
         loading={isLoading}
