@@ -1,12 +1,26 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useReducer, useState, useEffect, useCallback } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
 import ErrorModal from "../UI/ErrorModal";
 import Search from "./Search";
 
+const ingredientReducer = (currentIngredients, action) => {
+  switch (action.type) {
+    case "SET":
+      return action.ingredients;
+    case "ADD":
+      return [...currentIngredients, action.ingredient];
+    case "DELETE":
+      return currentIngredients.filter((ing) => ing.id !== action.id);
+    default:
+      throw new Error("Shouldn't happens");
+  }
+};
+
 const Ingredients = () => {
-  const [userIngredients, setUserIngridients] = useState([]);
+  const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
+  //const [userIngredients, setUserIngridients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
 
@@ -33,10 +47,7 @@ const Ingredients = () => {
         return response.json();
       })
       .then((body) => {
-        setUserIngridients((prevIngredients) => [
-          ...prevIngredients,
-          { id: body.name, ...ingredient },
-        ]);
+        dispatch({ type: "ADD", ingredient: { id: body.name, ...ingredient } });
       })
       .catch((error) => {
         setError(error.message);
@@ -53,17 +64,17 @@ const Ingredients = () => {
     )
       .then((response) => {
         setIsLoading(false);
-        setUserIngridients((prevIngredients) =>
-          prevIngredients.filter((ing) => ing.id !== ingredientId)
-        );
+        dispatch({ type: "DELETE", id: ingredientId });
       })
       .catch((error) => {
         setError(error.message);
+        setIsLoading(false);
       });
   };
 
   const filteredIngredientsHanlder = useCallback((filteredIngridients) => {
-    setUserIngridients(filteredIngridients);
+    //setUserIngridients(filteredIngridients);
+    dispatch({ type: "SET", ingredients: filteredIngridients });
   }, []);
 
   const clearError = () => {
