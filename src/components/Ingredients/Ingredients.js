@@ -21,7 +21,7 @@ const ingredientReducer = (currentIngredients, action) => {
 
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
-  const { isLoading, error, data, sendRequest } = useHttp();
+  const { isLoading, error, data, sendRequest, reqExtra, reqIdentifier } = useHttp();
 
   //Used to manage side effects
   //with [] useEffect acts like ComponentDidMount (it only run once)
@@ -29,36 +29,36 @@ const Ingredients = () => {
   //without [] acts like ComponentDidUpdate (every render) runs
   //after evetry component update re-render
   useEffect(() => {
-    console.log("Rendering ingredients", userIngredients);
-  });
+    if (!isLoading && !error && reqIdentifier === 'REMOVE_ING') {
+      dispatch({ type: "DELETE", id: reqExtra });
+    } else if(!isLoading && !error && reqIdentifier === 'ADD_ING') {
+      dispatch({ type: "ADD", ingredient: { id: data.name, ...reqExtra } });
+    }
+  }, [data, reqExtra, reqIdentifier, isLoading]);
 
   const addIngridientHandler = useCallback((ingredient) => {
     //dispatchHttp({ type: "SEND" });
-    fetch("https://react-hooks-update-66a24.firebaseio.com/ingredients.json", {
-      method: "POST",
-      body: JSON.stringify({ ingredient }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        //dispatchHttp({ type: "RESPONSE" });
-        return response.json();
-      })
-      .then((body) => {
-        dispatch({ type: "ADD", ingredient: { id: body.name, ...ingredient } });
-      })
-      .catch((error) => {
-        //dispatchHttp({ type: "ERROR", errorData: error.message });
-      });
-  }, []);
-
-  const removeIngredientHandler = useCallback((ingredientId) => {
     sendRequest(
-      `https://react-hooks-update-66a24.firebaseio.com/ingredients/${ingredientId}.json`,
-      "DELETE"
+      "https://react-hooks-update-66a24.firebaseio.com/ingredients.json",
+      "POST",
+      JSON.stringify({ ingredient }),
+      ingredient,
+      'ADD_ING'
     );
   }, [sendRequest]);
+
+  const removeIngredientHandler = useCallback(
+    (ingredientId) => {
+      sendRequest(
+        `https://react-hooks-update-66a24.firebaseio.com/ingredients/${ingredientId}.json`,
+        "DELETE",
+        null,
+        ingredientId,
+        'REMOVE_ING'
+      );
+    },
+    [sendRequest]
+  );
 
   const filteredIngredientsHanlder = useCallback((filteredIngridients) => {
     //setUserIngridients(filteredIngridients);

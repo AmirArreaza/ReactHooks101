@@ -11,7 +11,6 @@ const Search = React.memo((props) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (enteredFilter === inputRef.current.value) {
-        console.log("Filtro ", enteredFilter);
         const query =
           enteredFilter.length === 0
             ? ""
